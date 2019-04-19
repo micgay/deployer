@@ -11,6 +11,7 @@ use Deployer\Deployer;
 use Deployer\Exception\RuntimeException;
 use Deployer\Host\Host;
 use Deployer\Utility\ProcessOutputPrinter;
+use phpseclib\Net\SSH2;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -80,6 +81,17 @@ class Client
         if ($host->isMultiplexing() === null ? $this->multiplexing : $host->isMultiplexing()) {
             $sshArguments = $this->initMultiplexing($host);
         }
+
+        $sshhost = substr($host, strpos($host, '@') + 1);
+        $port = $sshArguments->getFlag('-p');
+        $user = $host->getUser();
+        $password = $host->getConfig()->get('ssh_password');
+
+        $ssh = new SSH2($sshhost.':'.$port);
+        if (!$ssh->login($user, $password)) {
+            exit('Login Failed');
+        }
+        return 'bash';
 
         $shellCommand = $host->getShellCommand();
 
