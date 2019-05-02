@@ -85,11 +85,11 @@ class Client
         $sshhost = substr($host, strpos($host, '@') + 1);
         $port = $sshArguments->getFlag('-p');
         $user = $host->getUser();
-        $password = $host->getConfig()->get('ssh_password');
+        $password = $host->getConfig()->get('password');
 
         $ssh = new SSH2($sshhost.':'.$port);
         if (!$ssh->login($user, $password)) {
-            exit('Login Failed');
+            return 'Login Failed';
         }
         return 'bash';
 
